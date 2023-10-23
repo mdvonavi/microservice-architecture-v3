@@ -1,5 +1,7 @@
 CREATE DATABASE microservice;
 
+\c microservice
+
 CREATE SCHEMA dev;
 
 CREATE TABLE dev.hard_skills
@@ -35,19 +37,23 @@ CREATE TABLE dev.users
 	avatar varchar(10) references dev.images(id),
 	info varchar(256),
 	nickname varchar(20) NOT NULL,
-	email varchar(30),
+	email varchar(256),
     phone varchar(11),
     PRIMARY KEY (id)
 );
 
 CREATE TABLE dev.users_hard_skills
 (
+	id integer,
 	hard_skill int references dev.hard_skills(id) NOT NULL,
-	user_id bigserial references dev.users(id) NOT NULL
+	user_id bigserial references dev.users(id) NOT NULL,
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE dev.subscriptions
 (
+	id SERIAL,
 	user_id bigserial references dev.users(id) NOT NULL,
-	subs_id bigserial references dev.users(id) NOT NULL
+	subs_id bigserial references dev.users(id) NOT NULL,
+	PRIMARY KEY (id)
 );
