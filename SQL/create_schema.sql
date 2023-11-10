@@ -31,7 +31,7 @@ CREATE TABLE dev.users
 	first_name varchar(30),
 	middle_name varchar(30),
 	last_name varchar(30),
-	sex integer,
+	sex boolean,
 	birth_date date,
 	city int references dev.cities(id),
 	avatar varchar(10) references dev.images(id),
@@ -39,6 +39,7 @@ CREATE TABLE dev.users
 	nickname varchar(20) NOT NULL,
 	email varchar(256),
     phone varchar(11),
+	deleted boolean NOT NULL DEFAULT false,
     PRIMARY KEY (id)
 );
 

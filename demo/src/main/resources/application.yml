@@ -1,0 +1,11 @@
+server:
+  error:
+    include-message: always
+spring:
+  jpa:
+    show-sql: true
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    initialization-mode: always

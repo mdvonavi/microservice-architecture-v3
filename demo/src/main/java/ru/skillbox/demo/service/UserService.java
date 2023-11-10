@@ -1,5 +1,7 @@
 package ru.skillbox.demo.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger("application");
 
     private final UserRepository userRepository;
 
@@ -38,6 +42,7 @@ public class UserService {
                     String.format("user id %s not equal to path id %s", user.getId(), id)
             );
         }
+        log.debug(String.format("user nickname : %s", user.getNickname()));
         User updatedUser = userRepository.save(user);
         return String.format("User %s updated with id = %s", updatedUser.getLastName(), updatedUser.getId());
     }
