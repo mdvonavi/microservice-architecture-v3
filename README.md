@@ -18,24 +18,42 @@
 
 ###Установка:
 - Клонируйте репозиторий:
-  > git clone https://github.com/mdvonavi/microservice-architecture-v3.git
+```shell
+git clone https://github.com/mdvonavi/microservice-architecture-v3.git
+```
+
 - Установите необходимые зависимости с помощью Gradle.
 - Запустите сборку проекта с помощью Gradle.
+```shell
+./gradlew build
+```
 - Если будет использоваться существующая БД PostgreSQL, то создайте необходимые объекты БД с помощью скрипта SQL/create_schema.sql и внесите параметры в docker-compose.yml
 - Запустите установку проекта в docker: 
-  > docker-compose up
+```shell
+docker-compose up
+```
 - Сервис доступен на 8080 порту
 
 ###Текущие возможности:
 - Получение списка пользователей:
-> GET /users
+```shell
+curl GET http://localhost:8080/users
+```
 - Получение пользователя по id:
-> GET /users/1
+```shell
+curl GET http://localhost:8080/users/1
+```
 - Добавление пользователя:
-> POST /users
+```shell
+curl POST http://localhost:8080/users
+```
 - Обновление данных о пользователя по id:
-> PUT /users/1
+```shell
+curl PUT http://localhost:8080/users/1
+```
 - Удаление пользователя:
-> DELETE /users/1
+```shell
+curl DELETE http://localhost:8080/users/1
+```
 
 Благодарим вас за ваши усилия и интерес к нашему проекту!

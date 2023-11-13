@@ -29,6 +29,34 @@ public class User {
     private String phone;
     private boolean deleted = Boolean.FALSE;
 
+    public User(
+            Long id,
+            String firstName,
+            String lastName,
+            String middleName,
+            Boolean sex,
+            Date birthDate,
+            Integer city,
+            String avatar,
+            String info,
+            String nickname,
+            String email,
+            String phone
+    ) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.sex = sex;
+        this.birthDate = birthDate;
+        this.city = city;
+        this.avatar = avatar;
+        this.info = info;
+        this.nickname = nickname;
+        this.email = email;
+        this.phone = phone;
+    }
+
     public String getMiddleName() {
         return middleName;
     }

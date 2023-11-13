@@ -24,7 +24,7 @@ public class UserService {
 
     public String createUser(User user) {
         User savedUser = userRepository.save(user);
-        return String.format("User %s added with id = %s",savedUser.getLastName(), savedUser.getId());
+        return String.format("User %s added with id = %s", savedUser.getLastName(), savedUser.getId());
     }
 
     public User getUser(long id) {

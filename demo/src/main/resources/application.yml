@@ -9,3 +9,6 @@ spring:
       connectionTimeout: 20000
       maximumPoolSize: 5
     initialization-mode: always
+    url: jdbc:postgresql://localhost:5432/microservice?currentSchema=dev
+    username: postgres
+    password: postgres
