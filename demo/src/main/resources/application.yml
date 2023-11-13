@@ -12,3 +12,5 @@ spring:
     url: jdbc:postgresql://localhost:5432/microservice?currentSchema=dev
     username: postgres
     password: postgres
+  liquibase:
+    liquibase-schema: dev
