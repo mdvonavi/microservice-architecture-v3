@@ -1,5 +1,6 @@
 package ru.skillbox.demo.entity;
 
+import liquibase.repackaged.org.apache.commons.lang3.time.DateFormatUtils;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -136,11 +137,19 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                '}';
+        return "{" +
+                "id:" + this.id + "," +
+                "sex:" + this.sex + "," +
+                "birthDate:" + DateFormatUtils.format(this.birthDate, "dd-MM-yyyy") + "," +
+                "city:" + this.city + ","+
+                "avatar:" + this.avatar + "," +
+                "info:" + this.info + "," +
+                "firstName:" + this.firstName + "," +
+                "lastName:" + this.lastName + "," +
+                "middleName:" + this.middleName + ","+
+                "nickname:" + this.nickname + ","+
+                "email:" + this.email + "," +
+                "phone:" + this.phone +
+                "}";
     }
 }
