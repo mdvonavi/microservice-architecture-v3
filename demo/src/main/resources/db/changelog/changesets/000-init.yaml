@@ -95,27 +95,27 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
-  - changeSet:
-      id: 000-4
-      author: mdvonavi
-      changes:
-        - addForeignKeyConstraint:
-            constraintName: users_sities_fk
-            baseTableName: users
-            baseColumnNames: city
-            referencedTableName: cities
-            referencedColumnNames: id
+#  - changeSet:
+#      id: 000-4
+#      author: mdvonavi
+#      changes:
+#        - addForeignKeyConstraint:
+#            constraintName: users_sities_fk
+#            baseTableName: users
+#            baseColumnNames: city
+#            referencedTableName: cities
+#            referencedColumnNames: id
 
-  - changeSet:
-      id: 000-5
-      author: mdvonavi
-      changes:
-        - addForeignKeyConstraint:
-            constraintName: users_avatar_fk
-            baseTableName: users
-            baseColumnNames: avatar
-            referencedTableName: images
-            referencedColumnNames: id
+#  - changeSet:
+#      id: 000-5
+#      author: mdvonavi
+#      changes:
+#        - addForeignKeyConstraint:
+#            constraintName: users_avatar_fk
+#            baseTableName: users
+#            baseColumnNames: avatar
+#            referencedTableName: images
+#            referencedColumnNames: id
 
   - changeSet:
       id: 000-6
