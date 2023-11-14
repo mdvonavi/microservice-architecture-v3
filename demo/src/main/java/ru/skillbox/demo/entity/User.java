@@ -1,5 +1,6 @@
 package ru.skillbox.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import liquibase.repackaged.org.apache.commons.lang3.time.DateFormatUtils;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -18,6 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Boolean sex;
+    @JsonFormat(pattern="dd-MM-yyyy")
     private Date birthDate;
     private Integer city;
     private String avatar;

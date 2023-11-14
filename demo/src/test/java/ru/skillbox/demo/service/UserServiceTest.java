@@ -1,23 +1,38 @@
 package ru.skillbox.demo.service;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.server.ResponseStatusException;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import ru.skillbox.demo.entity.User;
 import ru.skillbox.demo.repository.UserRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
 class UserServiceTest {
+
+    private MockMvc mockMvc;
 
     SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -72,6 +87,11 @@ class UserServiceTest {
     UserServiceTest() throws ParseException {
     }
 
+    @BeforeEach
+    public void setUp(WebApplicationContext context) {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+    }
+
     @Test
     void createUser() {
         //given
@@ -82,12 +102,10 @@ class UserServiceTest {
         String result = userService.createUser(user);
 
         //then
-        Assertions.assertEquals(
+        assertEquals(
                 "User Ivanov added with id = 1",
                 result
         );
-
-
     }
 
     @Test
@@ -99,7 +117,7 @@ class UserServiceTest {
         User user = userService.getUser(1L);
 
         //then
-        Assertions.assertEquals(
+        assertEquals(
                 "{" +
                         "id:1," +
                         "sex:true," +
@@ -128,10 +146,59 @@ class UserServiceTest {
         String result = userService.updateUser(updatedUser, 1L);
 
         //then
-        Assertions.assertEquals(
+        assertEquals(
                 "User Ivanof updated with id = 1",
                 result
         );
+    }
+
+    @Test
+    void updateUserNotFound() {
+        //given
+        Mockito.when(userRepository.save(updatedUser)).thenReturn(updatedUser);
+        Mockito.when(userRepository.existsById(1L)).thenThrow(ResponseStatusException.class);
+
+        //when
+        Executable executable = () -> userService.updateUser(updatedUser, 1L);
+
+        //then
+        assertThrows(ResponseStatusException.class, executable);
+    }
+
+    @Test
+    void updateUserBadRequest() throws Exception {
+
+        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(savedUser);
+
+        Map<String,Object> user = new HashMap<>();
+        user.put("id",1);
+        user.put("firstName","Ivan");
+        user.put("lastName","Ivanov");
+        user.put("middleName","Ivanovich");
+        user.put("sex","true");
+        user.put("birthDate","10-08-1990");
+        user.put("city",1);
+        user.put("avatar","dummyLink");
+        user.put("info","some info string");
+        user.put("nickname","ivanoff");
+        user.put("email","mail@mail.ru");
+        user.put("phone","79991234567");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", 2)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+
     }
 
     @Test
@@ -143,7 +210,7 @@ class UserServiceTest {
         userService.deleteUser(1L);
 
         //then
-        Assertions.assertEquals(
+        assertEquals(
                 "User Ivanof updated with id = 1",
                 "User Ivanof updated with id = 1"
         );
@@ -160,7 +227,7 @@ class UserServiceTest {
         List<User> result = userService.getUsers();
 
         //then
-        Assertions.assertEquals(
+        assertEquals(
                 "[]",
                 result.toString()
         );
@@ -178,10 +245,10 @@ class UserServiceTest {
         List<User> result = userService.getUsers();
 
         //then
-        Assertions.assertEquals(
+        assertEquals(
                 "[" +
                         "{" +
-                        "id:null," +
+                        "id:1," +
                         "sex:true," +
                         "birthDate:10-08-1990," +
                         "city:1," +

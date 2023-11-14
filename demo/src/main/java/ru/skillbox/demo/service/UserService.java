@@ -33,15 +33,17 @@ public class UserService {
     }
 
     public String updateUser(User user, long id) {
-        if (!userRepository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
         if (user.getId() != id){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     String.format("user id %s not equal to path id %s", user.getId(), id)
             );
         }
+
+        if (!userRepository.existsById(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
         log.debug(String.format("user nickname : %s", user.getNickname()));
         User updatedUser = userRepository.save(user);
         return String.format("User %s updated with id = %s", updatedUser.getLastName(), updatedUser.getId());
