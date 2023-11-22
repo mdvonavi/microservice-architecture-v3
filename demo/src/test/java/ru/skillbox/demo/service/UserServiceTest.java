@@ -1,5 +1,7 @@
 package ru.skillbox.demo.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -43,6 +45,11 @@ class UserServiceTest {
             "ivanoff",
             "mail@mail.ru",
             "79991234567"
+    );
+
+    User minUser = new User(
+            "ivanoff",
+            "mail@mail.ru"
     );
 
     User savedUser = new User(
@@ -122,6 +129,31 @@ class UserServiceTest {
     }
 
     @Test
+    void minUserTest() throws Exception {
+        log.info("start minUserTest test");
+
+        log.info("run post request");
+        ResultActions postResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(minUser.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
+
+        log.info("run get request");
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        User resultUser = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+
+        Assertions.assertEquals(resultUser.getEmail(), user.getEmail());
+        Assertions.assertEquals(resultUser.getNickname(), user.getNickname());
+
+    }
+
+    @Test
     void getUser() throws Exception {
         log.info("start getUser test");
 
@@ -136,10 +168,45 @@ class UserServiceTest {
         savedUser.setId(Long.valueOf(savedUserId));
 
         log.info("run get request");
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 //                .andExpect(content().json(savedUser.toString()));
+
+        User resultUser = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+
+        Assertions.assertEquals(resultUser.getFirstName(), user.getFirstName());
+        Assertions.assertEquals(resultUser.getLastName(), user.getLastName());
+        Assertions.assertEquals(resultUser.getMiddleName(), user.getMiddleName());
+        Assertions.assertEquals(resultUser.getEmail(), user.getEmail());
+        Assertions.assertEquals(resultUser.getPhone(), user.getPhone());
+        Assertions.assertEquals(resultUser.getSex(), user.getSex());
+        Assertions.assertEquals(resultUser.getNickname(), user.getNickname());
+        Assertions.assertEquals(resultUser.getAvatar(), user.getAvatar());
+        Assertions.assertEquals(resultUser.getCity(), user.getCity());
+        Assertions.assertEquals(resultUser.getInfo(), user.getInfo());
+        //Assertions.assertEquals(resultUser.getBirthDate(), user.getBirthDate());
+
+    }
+
+    @Test
+    void getUserNotFound() throws Exception {
+        log.info("start getUserNotFound test");
+
+        log.info("run get request");
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", 999)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteUserNotFound() throws Exception {
+        log.info("start deleteUserNotFound test");
+
+        log.info("run delete request");
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", 999)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -166,14 +233,15 @@ class UserServiceTest {
     @Test
     void updateUserNotFound() throws Exception {
         log.info("start updateUserNotFound test");
-        Integer badUserId = 999;
+        Long badUserId = 999L;
+        updatedUser.setId(badUserId);
 
         log.info("run put request");
         mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", badUserId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedUser.toString())
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package ru.skillbox.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.annotations.SQLDelete;
@@ -27,6 +28,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Boolean sex;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birthDate;
     private Integer city;
     private String avatar;
@@ -38,6 +40,15 @@ public class User {
     private String email;
     private String phone;
     private boolean deleted = Boolean.FALSE;
+
+    //minimum required user fields
+    public User(
+            String nickname,
+            String email
+    ) {
+        this.nickname = nickname;
+        this.email = email;
+    }
 
     public void setId(Long id) {
         this.id = id;
