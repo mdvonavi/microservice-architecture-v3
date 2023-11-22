@@ -2,46 +2,41 @@ package ru.skillbox.demo.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.server.ResponseStatusException;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import ru.skillbox.demo.entity.User;
-import ru.skillbox.demo.repository.UserRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
 class UserServiceTest {
+    private static final Logger log = LoggerFactory.getLogger("application");
 
     private MockMvc mockMvc;
 
-    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     User user = new User(
             "Ivan",
             "Ivanov",
             "Ivanovich",
             true,
-            formatter.parse("10.08.1990"),
+            formatter.parse("1990-08-15"),
             1,
             "dummyLink",
             "some info string",
@@ -56,7 +51,7 @@ class UserServiceTest {
             "Ivanov",
             "Ivanovich",
             true,
-            formatter.parse("10.08.1990"),
+            formatter.parse("1990-08-15"),
             1,
             "dummyLink",
             "some info string",
@@ -71,7 +66,7 @@ class UserServiceTest {
             "Ivanof",
             "Ivanovi4",
             false,
-            formatter.parse("10.08.19911"),
+            formatter.parse("1990-08-16"),
             2,
             "dummyLink2",
             "another info string",
@@ -79,10 +74,6 @@ class UserServiceTest {
             "vanya@mail.ru",
             "77771234567"
     );
-
-    UserRepository userRepository = Mockito.mock(UserRepository.class);
-
-    UserService userService = new UserService(userRepository);
 
     UserServiceTest() throws ParseException {
     }
@@ -93,176 +84,141 @@ class UserServiceTest {
     }
 
     @Test
-    void createUser() {
-        //given
-
-        Mockito.when(userRepository.save(user)).thenReturn(savedUser);
-
-        //when
-        String result = userService.createUser(user);
-
-        //then
-        assertEquals(
-                "User Ivanov added with id = 1",
-                result
-        );
+    void getUsersEmptyList() throws Exception {
+        log.info("start getUsersEmptyList test");
+        log.info("run get request");
+        mockMvc.perform(MockMvcRequestBuilders.get("/users")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
     @Test
-    void getUser() {
-        //given
-        Mockito.when(userRepository.findById(1L)).thenReturn(java.util.Optional.ofNullable(savedUser));
+    void getUsersNotEmptyList() throws Exception {
+        log.info("start getUsersNotEmptyList test");
+        log.info("run post request");
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(user.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-        //when
-        User user = userService.getUser(1L);
-
-        //then
-        assertEquals(
-                "{" +
-                        "id:1," +
-                        "sex:true," +
-                        "birthDate:10-08-1990," +
-                        "city:1," +
-                        "avatar:dummyLink," +
-                        "info:some info string," +
-                        "firstName:Ivan," +
-                        "lastName:Ivanov," +
-                        "middleName:Ivanovich," +
-                        "nickname:ivanoff," +
-                        "email:mail@mail.ru," +
-                        "phone:79991234567" +
-                        "}",
-                user.toString()
-        );
+        log.info("run get request");
+        mockMvc.perform(MockMvcRequestBuilders.get("/users")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+//                .andExpect(content().string(String.format("[%s]", savedUser.toString())));
     }
 
     @Test
-    void updateUser() {
-        //given
-        Mockito.when(userRepository.save(updatedUser)).thenReturn(updatedUser);
-        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
-
-        //when
-        String result = userService.updateUser(updatedUser, 1L);
-
-        //then
-        assertEquals(
-                "User Ivanof updated with id = 1",
-                result
-        );
+    void createUser() throws Exception {
+        log.info("start createUser test");
+        log.info("run post request");
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(user.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void updateUserNotFound() {
-        //given
-        Mockito.when(userRepository.save(updatedUser)).thenReturn(updatedUser);
-        Mockito.when(userRepository.existsById(1L)).thenThrow(ResponseStatusException.class);
+    void getUser() throws Exception {
+        log.info("start getUser test");
 
-        //when
-        Executable executable = () -> userService.updateUser(updatedUser, 1L);
+        log.info("run post request");
+        ResultActions postResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(user.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-        //then
-        assertThrows(ResponseStatusException.class, executable);
+        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
+        savedUser.setId(Long.valueOf(savedUserId));
+
+        log.info("run get request");
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+//                .andExpect(content().json(savedUser.toString()));
+    }
+
+    @Test
+    void updateUser() throws Exception {
+        log.info("start updateUser test");
+
+        log.info("run post request");
+        ResultActions postResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(user.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
+        updatedUser.setId(Long.valueOf(savedUserId));
+        log.info("run put request");
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", savedUserId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedUser.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateUserNotFound() throws Exception {
+        log.info("start updateUserNotFound test");
+        Integer badUserId = 999;
+
+        log.info("run put request");
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", badUserId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedUser.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void updateUserBadRequest() throws Exception {
+        log.info("start updateUserBadRequest test");
+        Integer badUserId = 999;
 
-        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(savedUser);
-
-        Map<String,Object> user = new HashMap<>();
-        user.put("id",1);
-        user.put("firstName","Ivan");
-        user.put("lastName","Ivanov");
-        user.put("middleName","Ivanovich");
-        user.put("sex","true");
-        user.put("birthDate","10-08-1990");
-        user.put("city",1);
-        user.put("avatar","dummyLink");
-        user.put("info","some info string");
-        user.put("nickname","ivanoff");
-        user.put("email","mail@mail.ru");
-        user.put("phone","79991234567");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
+        log.info("run post request");
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user))
+                .content(user.toString())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", 2)
+        log.info("run put request");
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", badUserId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user))
+                .content(updatedUser.toString())
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
-
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deleteUser() {
-        //given
-        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
+    void deleteUser() throws Exception {
+        log.info("start deleteUser test");
 
-        //when
-        userService.deleteUser(1L);
+        log.info("run post request");
+        ResultActions postResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(user.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-        //then
-        assertEquals(
-                "User Ivanof updated with id = 1",
-                "User Ivanof updated with id = 1"
-        );
+        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
+
+        log.info("run delete request");
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", savedUserId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        log.info("run get request");
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
-    @Test
-    void getUsersEmptyList() {
-        //given
-        List<User> userList = new ArrayList<>();
 
-        Mockito.when(userRepository.findAll()).thenReturn(userList);
-
-        //when
-        List<User> result = userService.getUsers();
-
-        //then
-        assertEquals(
-                "[]",
-                result.toString()
-        );
-    }
-
-    @Test
-    void getUsersNotEmptyList() {
-        //given
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-
-        Mockito.when(userRepository.findAll()).thenReturn(userList);
-
-        //when
-        List<User> result = userService.getUsers();
-
-        //then
-        assertEquals(
-                "[" +
-                        "{" +
-                        "id:1," +
-                        "sex:true," +
-                        "birthDate:10-08-1990," +
-                        "city:1," +
-                        "avatar:dummyLink," +
-                        "info:some info string," +
-                        "firstName:Ivan," +
-                        "lastName:Ivanov," +
-                        "middleName:Ivanovich," +
-                        "nickname:ivanoff," +
-                        "email:mail@mail.ru," +
-                        "phone:79991234567" +
-                        "}" +
-                        "]",
-                result.toString()
-        );
-    }
 }

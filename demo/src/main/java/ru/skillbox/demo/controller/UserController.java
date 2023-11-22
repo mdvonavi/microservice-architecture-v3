@@ -4,8 +4,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.skillbox.demo.entity.User;
 import ru.skillbox.demo.service.UserService;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
@@ -22,8 +20,8 @@ public class UserController {
     }
 
     @GetMapping(path="/{id}")
-    User getUser(@PathVariable long id){
-        return userService.getUser(id);
+    String getUser(@PathVariable long id){
+        return userService.getUser(id).toString();
     }
 
     @PutMapping(path="/{id}")
@@ -37,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping
-    List<User> getUsers(){
+    String getUsers(){
         return userService.getUsers();
     }
 }

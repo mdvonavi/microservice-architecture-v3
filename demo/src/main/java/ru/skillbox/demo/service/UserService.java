@@ -8,8 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skillbox.demo.entity.User;
 import ru.skillbox.demo.repository.UserRepository;
 
-import java.util.List;
-
 @Service
 public class UserService {
 
@@ -44,7 +42,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        log.debug(String.format("user nickname : %s", user.getNickname()));
         User updatedUser = userRepository.save(user);
         return String.format("User %s updated with id = %s", updatedUser.getLastName(), updatedUser.getId());
     }
@@ -57,7 +54,7 @@ public class UserService {
         return String.format("User deleted with id = %s", id);
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public String getUsers() {
+        return userRepository.findAll().toString();
     }
 }
