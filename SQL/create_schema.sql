@@ -1,5 +1,3 @@
-CREATE DATABASE microservice;
+--liquibase formatted sql
 
-\c microservice
-
-CREATE SCHEMA dev;
+create schema if not exists dev;

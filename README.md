@@ -56,4 +56,20 @@ curl PUT http://localhost:8080/users/1
 curl DELETE http://localhost:8080/users/1
 ```
 
+###Пример json для создания пользователя
+```{
+    "firstName": "Ivan",
+    "lastName": "Ivanov",
+    "city": 1,
+    "phone": "79991234567",
+    "sex": "true",
+    "nickname": "ivanoff",
+    "middleName": "Ivanovich",
+    "id": 1,
+    "avatar": "dummyLink",
+    "birthDate": "10-08-1990",
+    "email": "mail@mail.ru",
+    "info": "some info string"
+}```
+
 Благодарим вас за ваши усилия и интерес к нашему проекту!
