@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-microservice-deployment
+  labels:
+    app: java-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-microservice
+  template:
+    metadata:
+      labels:
+        app: java-microservice
+    spec:
+      containers:
+        - name: java-microservice
+          image: gcr.io/kaniko-project/executor:latest
+          args:
+            - "--dockerfile=/run/desktop/mnt/host/c/temp/Dockerfile"
+            - "--context=tar://stdin"
+            - "--destination=gcr.io/my-repo/my-image"
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: microservice-config
+                  key: postgres_host
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://microservice_db:5432/microservice?currentSchema=dev
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-microservice-service
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  selector:
+    app: java-microservice
+
