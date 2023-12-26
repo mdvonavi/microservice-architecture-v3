@@ -1,13 +1,17 @@
 package ru.skillbox.demo.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
+import ru.skillbox.demo.UserConvertor;
 import ru.skillbox.demo.entity.User;
 import ru.skillbox.demo.service.UserService;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
-
+    private final UserConvertor userConvertor = new UserConvertor();
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -35,7 +39,13 @@ public class UserController {
     }
 
     @GetMapping
-    String getUsers(){
-        return userService.getUsers();
+    public String getUsers() throws JsonProcessingException {
+        return userService.getUsers()
+                .stream()
+                .map(userConvertor::convertToDto)
+                .collect(Collectors.toList())
+                .toString();
     }
+
+
 }

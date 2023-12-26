@@ -2,19 +2,22 @@ package ru.skillbox.demo.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.skillbox.demo.entity.User;
 import ru.skillbox.demo.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
     private static final Logger log = LoggerFactory.getLogger("application");
 
+    @Autowired
     private final UserRepository userRepository;
-
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -54,7 +57,7 @@ public class UserService {
         return String.format("User deleted with id = %s", id);
     }
 
-    public String getUsers() {
-        return userRepository.findAll().toString();
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 }

@@ -3,6 +3,7 @@ package ru.skillbox.demo.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
+@Data
 @EnableAutoConfiguration
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
