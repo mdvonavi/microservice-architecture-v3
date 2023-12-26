@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata: 
   name: microservice-config
 data:
-  postgres_host: http://postgres-service
+  postgres_host: postgres-service

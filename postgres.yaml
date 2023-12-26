@@ -22,17 +22,21 @@ spec:
           env:
             - name: POSTGRES_DB
               value: microservice
+            - name: POSTGRES_SCHEMA
+              value: microservice
             - name: POSTGRES_USER
               value: postgres
             - name: POSTGRES_PASSWORD
               value: postgres
           volumeMounts:
             - name: pgdata
-              mountPath: /docker-entrypoint-initdb.d/
+              mountPath: /docker-entrypoint-initdb.d/create_schema.sql
       volumes:
         - name: pgdata
           hostPath:
-            path: /run/desktop/mnt/host/c/temp/sql/
+            path: /home/docker/create_schema.sql
+            type: File
+
 
 ---
 
