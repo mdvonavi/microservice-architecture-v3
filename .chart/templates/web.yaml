@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.web.name }}-deployment
+  labels:
+    app: {{ .Values.web.name }}
+spec:
+  replicas: {{ .Values.web.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.web.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.web.name }}
+    spec:
+      containers:
+        - name: {{ .Values.web.name }}
+          image: {{ .Values.web.image.name }}:{{ .Values.web.image.version }}
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: microservice-config
+                  key: postgres_host
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.db.POSTGRES_PASSWORD }}
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://$(POSTGRES_HOST):{{ .Values.db.port }}/{{ .Values.db.POSTGRES_DB }}?currentSchema={{ .Values.db.schema }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.db.POSTGRES_USER }}
+          ports:
+            - containerPort: {{ .Values.web.container_port }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.web.name }}-service
+spec:
+  ports:
+    - protocol: TCP
+      port: {{ .Values.web.port }}
+      targetPort: {{ .Values.web.port }}
+  selector:
+    app: {{ .Values.web.name }}
+

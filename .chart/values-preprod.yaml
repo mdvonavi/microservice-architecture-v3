@@ -1,0 +1,26 @@
+app_name: microservice
+db_host: postgres-service
+web_service: java-microservice
+app_port: 8080
+db:
+  POSTGRES_DB: microservice
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  port: 5432
+  containerPort: 5432
+  name: postgres
+  app_name: db
+  init_file: /run/desktop/mnt/host/c/temp/scripts/schema_preprod.sql
+  image:
+    name: postgres
+    version: 14.1-alpine
+  replicas: 1
+  schema: preprod
+web:
+  name: java-microservice
+  replicas: 1
+  port: 8080
+  container_port: 8080
+  image:
+    name: mdvonavi/java_microservice
+    version: 0.0.2
