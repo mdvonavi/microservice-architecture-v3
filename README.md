@@ -70,6 +70,13 @@ curl DELETE http://localhost:8080/users/1
     "birthDate": "10-08-1990",
     "email": "mail@mail.ru",
     "info": "some info string"
-}```
+}
+```
+
+###Создание неймспейсов в кластере:
+```shell
+kubectl create namespace dev
+kubectl create namespace preprod
+```
 
 Благодарим вас за ваши усилия и интерес к нашему проекту!
