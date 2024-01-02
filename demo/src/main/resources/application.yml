@@ -2,6 +2,10 @@ server:
   error:
     include-message: always
 spring:
+  servlet:
+    multipart:
+      location: c:/temp/servlet_temp_folder
+      enabled: true
   jpa:
     show-sql: true
   datasource:
@@ -12,8 +16,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/microservice?currentSchema=dev
     username: postgres
     password: postgres
-  liquibase:
-    liquibase-schema: dev
+#  liquibase:
+#    liquibase-schema: dev
 logging:
   file: my-app.log
   level:
@@ -21,3 +25,8 @@ logging:
       springframework: INFO
   pattern:
     console: d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+minio:
+  endpoint: http://localhost:9000
+  accessKey: mEHwckpLcE3mihAcJKjI
+  secretKey: xtER9wtteKAyx0SNv6HEVX4cN4hZ4jnR6DgIw19i
+  bucketName: test

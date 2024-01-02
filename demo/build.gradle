@@ -24,6 +24,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.modelmapper:modelmapper:2.1.1'
 	implementation 'org.projectlombok:lombok:1.18.18'
+	// https://mvnrepository.com/artifact/io.minio/minio
+	implementation 'io.minio:minio:8.5.7'
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.liquibase:liquibase-core'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
