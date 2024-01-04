@@ -14,6 +14,7 @@ import ru.skillbox.demo.entity.Post;
 import ru.skillbox.demo.entity.PostImage;
 import ru.skillbox.demo.repository.PostImageRepository;
 import ru.skillbox.demo.repository.PostRepository;
+import ru.skillbox.demo.repository.UserRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,19 +38,37 @@ public class PostService {
     @Autowired
     private final PostImageRepository postImageRepository;
 
-    public PostService(MinioClient minioClient, PostRepository postRepository, PostImageRepository postImageRepository) {
+    @Autowired
+    private final UserRepository userRepository;
+
+    public PostService(MinioClient minioClient, PostRepository postRepository, PostImageRepository postImageRepository, UserRepository userRepository) {
         this.minioClient = minioClient;
         this.postRepository = postRepository;
         this.postImageRepository = postImageRepository;
+        this.userRepository = userRepository;
     }
+
     public String createPost(Post post) {
         Post savedPost = postRepository.save(post);
         return String.format("post added with id = %s",  savedPost.getId());
     }
 
     public Object getPost(long id) {
-        return postRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        post.setImages(getImageListByPostId(id));
+        return post;
     }
+
+    private List<String> getImageListByPostId(long id) {
+        List<PostImage> imageList = postImageRepository.findByPostId(id);
+        List<String> stringList = new ArrayList<>();
+
+        for (PostImage image : imageList) {
+            stringList.add(image.getEtag());
+        }
+        return stringList;
+    }
+
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
@@ -64,8 +83,7 @@ public class PostService {
         List<String> imageIds = new ArrayList<>();
 
         for (MultipartFile imageFile : imageFiles) {
-            String imageId = UUID.randomUUID().toString();
-
+            String imageId = UUID.randomUUID() + "-" + imageFile.getOriginalFilename();
 
             InputStream stream = imageFile.getInputStream();
 
@@ -87,20 +105,20 @@ public class PostService {
     }
 
     public String savePostWithImages(Post post, List<MultipartFile> imageFiles) {
+        if ((post.getUserId() == null)|(!userRepository.existsById(post.getUserId()))){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
         try {
             Post savedPost = postRepository.save(post);
-            // Сохранение изображений в MinIO и получение их идентификаторов
+
             List<String> imageIds = saveImagesToMinio(imageFiles);
 
-            // Связывание изображений с постом
             List<PostImage> postImages = createPostImageEntities(savedPost, imageIds);
 
-
-
-            return "post added";
+            return "post added with id= " + savedPost.getId().toString();
         } catch (IOException | InvalidKeyException | NoSuchAlgorithmException | MinioException e) {
             e.printStackTrace();
-            // Обработка ошибки сохранения
             return null;
         }
     }

@@ -27,6 +27,6 @@ logging:
     console: d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
 minio:
   endpoint: http://localhost:9000
-  accessKey: mEHwckpLcE3mihAcJKjI
-  secretKey: xtER9wtteKAyx0SNv6HEVX4cN4hZ4jnR6DgIw19i
-  bucketName: test
+  accessKey: N4fEAKZ3MHVNuG8PWZty
+  secretKey: g2VeptSoFqZWDlkMBslRRw3e4K1AYqiEMElFimGn
+  bucketName: postimages

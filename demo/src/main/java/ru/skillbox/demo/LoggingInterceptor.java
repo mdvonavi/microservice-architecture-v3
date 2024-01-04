@@ -3,6 +3,7 @@ package ru.skillbox.demo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,9 +15,11 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // Log request details
         String body = "";
-//        if ("PUT".equalsIgnoreCase(request.getMethod()))
+//        List<String> methods = Arrays.asList("PUT", "POST");
+//        if (methods.contains(request.getMethod().toUpperCase(Locale.ROOT)))
 //        {
-//            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+//            Scanner s = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
+//            body =  s.hasNext() ? s.next() : "";
 //        }
         logger.info("Received request: {} {} {} from {}", request.getMethod(), request.getRequestURI(), body, request.getRemoteAddr());
         return true;

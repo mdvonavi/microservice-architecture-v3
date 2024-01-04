@@ -3,6 +3,7 @@ package ru.skillbox.demo.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,7 @@ class UserServiceTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
+    @Order(1)
     @Test
     void getUsersEmptyList() throws Exception {
         log.info("start getUsersEmptyList test");

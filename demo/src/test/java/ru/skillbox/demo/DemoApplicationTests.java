@@ -28,6 +28,7 @@ class DemoApplicationTests {
 		registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
 	}
 
+
 	@Test
 	void contextLoads() {
 	}

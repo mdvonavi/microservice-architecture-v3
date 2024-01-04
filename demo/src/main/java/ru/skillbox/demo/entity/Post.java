@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -33,13 +34,21 @@ public class Post {
     private String descriptions;
     @CreationTimestamp
     private Date timestamp;
+    @Transient
+    private List<String> images;
     private boolean deleted = Boolean.FALSE;
 
-    public Post(Long id, String title, Long userId, String descriptions, Date timestamp) {
+    public Post(String title, Long userId, String descriptions, Date timestamp, List<String> images) {
         this.title = title;
         this.userId = userId;
         this.descriptions = descriptions;
         this.timestamp = timestamp;
+        this.images = images;
+    }
+
+    public Post(String title, String descriptions) {
+        this.title = title;
+        this.descriptions = descriptions;
     }
 
     public Post(){
@@ -51,6 +60,14 @@ public class Post {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getTitle() {
@@ -103,7 +120,9 @@ public class Post {
         if (this.userId != null) {
             post.put("userId", this.userId);
         }
-        
+        if (this.images != null) {
+            post.put("images", this.images);
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
 

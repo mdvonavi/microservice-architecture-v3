@@ -17,7 +17,7 @@ databaseChangeLog:
                    name: title
                    type: varchar(256)
               -  column:
-                   name: user
+                   name: user_id
                    type: bigserial
               -  column:
                    name: descriptions
@@ -38,7 +38,7 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             constraintName: users_posts_fk
             baseTableName: posts
-            baseColumnNames: user
+            baseColumnNames: user_id
             referencedTableName: users
             referencedColumnNames: id
 
