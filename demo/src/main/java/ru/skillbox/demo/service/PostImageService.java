@@ -15,7 +15,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 @Service
-public class FileService {
+public class PostImageService {
 
     @Autowired
     private MinioClient minioClient;

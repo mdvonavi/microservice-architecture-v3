@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-1
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: posts
+            columns:
+              - column:
+                  name: id
+                  autoIncrement: true
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              -  column:
+                   name: title
+                   type: varchar(256)
+              -  column:
+                   name: user
+                   type: bigserial
+              -  column:
+                   name: descriptions
+                   type: varchar(1024)
+              -  column:
+                   name: timestamp
+                   type: timestamp
+              -  column:
+                   name: deleted
+                   type: boolean
+                   defaultValueBoolean: false
+                   constraints:
+                     nullable: false
+  - changeSet:
+      id: 001-2
+      author: mdvonavi
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: users_posts_fk
+            baseTableName: posts
+            baseColumnNames: user
+            referencedTableName: users
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 001-3
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: posts_images
+            columns:
+              - column:
+                  name: id
+                  autoIncrement: true
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              -  column:
+                   name: post_id
+                   type: bigserial
+              -  column:
+                   name: etag
+                   type: varchar(64)
+              -  column:
+                   name: timestamp
+                   type: timestamp
+
+  - changeSet:
+      id: 001-4
+      author: mdvonavi
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: posts_images_fk
+            baseTableName: posts_images
+            baseColumnNames: post_id
+            referencedTableName: posts
+            referencedColumnNames: id
