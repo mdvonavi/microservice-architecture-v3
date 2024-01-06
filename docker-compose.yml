@@ -32,3 +32,35 @@ services:
       - 8080:8080
     depends_on:
       - postgres
+      
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio:RELEASE.2023-12-07T04-16-00Z.fips
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - c:/temp/minio/data:/data
+    environment:
+      - "MINIO_ROOT_USER=admin"
+      - "MINIO_ROOT_PASSWORD=password"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  createbuckets:
+    container_name: mc
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 admin password;
+      /usr/bin/mc mb myminio/postimages;
+      /usr/bin/mc anonymous set public myminio/postimages;
+      /usr/bin/mc share download --recursive myminio/postimages
+      exit 0;
+      "

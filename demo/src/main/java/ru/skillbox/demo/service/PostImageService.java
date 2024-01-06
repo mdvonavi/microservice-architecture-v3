@@ -25,20 +25,15 @@ public class PostImageService {
 
     public ObjectWriteResponse put(MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
-        InputStream stream = file.getInputStream();
-
-        ObjectWriteResponse response = minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(file.getOriginalFilename())
-                        .stream(stream, file.getSize(), -1)
-                        .build()
-        );
-
-        stream.close();
-
-
-        return response;
+        try (InputStream stream = file.getInputStream()){
+            return minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(file.getOriginalFilename())
+                            .stream(stream, file.getSize(), -1)
+                            .build()
+            );
+        }
 
     }
 }

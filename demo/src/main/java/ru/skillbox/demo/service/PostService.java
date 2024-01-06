@@ -1,7 +1,6 @@
 package ru.skillbox.demo.service;
 
 import io.minio.MinioClient;
-import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +68,13 @@ public class PostService {
         return stringList;
     }
 
+    public String deletePost(long id) {
+        if (!postRepository.existsById(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        postRepository.deleteById(id);
+        return String.format("Post deleted with id = %s", id);
+    }
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
@@ -85,17 +91,15 @@ public class PostService {
         for (MultipartFile imageFile : imageFiles) {
             String imageId = UUID.randomUUID() + "-" + imageFile.getOriginalFilename();
 
-            InputStream stream = imageFile.getInputStream();
-
-            ObjectWriteResponse response = minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(imageId)
-                            .stream(stream, imageFile.getSize(), -1)
-                            .build()
-            );
-
-            stream.close();
+            try (InputStream stream = imageFile.getInputStream()){
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(imageId)
+                                .stream(stream, imageFile.getSize(), -1)
+                                .build()
+                );
+            }
 
             // Сохранение идентификатора изображения
             imageIds.add(imageId);
@@ -104,7 +108,7 @@ public class PostService {
         return imageIds;
     }
 
-    public String savePostWithImages(Post post, List<MultipartFile> imageFiles) {
+    public String savePost(Post post, List<MultipartFile> imageFiles) {
         if ((post.getUserId() == null)|(!userRepository.existsById(post.getUserId()))){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -112,11 +116,12 @@ public class PostService {
         try {
             Post savedPost = postRepository.save(post);
 
-            List<String> imageIds = saveImagesToMinio(imageFiles);
+            if (imageFiles != null){
+                List<String> imageIds = saveImagesToMinio(imageFiles);
+                List<PostImage> postImages = createPostImageEntities(savedPost, imageIds);
+            }
 
-            List<PostImage> postImages = createPostImageEntities(savedPost, imageIds);
-
-            return "post added with id= " + savedPost.getId().toString();
+            return "post saved with id = " + savedPost.getId().toString();
         } catch (IOException | InvalidKeyException | NoSuchAlgorithmException | MinioException e) {
             e.printStackTrace();
             return null;
@@ -135,5 +140,9 @@ public class PostService {
         }
 
         return postImages;
+    }
+
+    public String updatePost(String postString, List<MultipartFile> imageFiles) {
+        return "updated";
     }
 }
