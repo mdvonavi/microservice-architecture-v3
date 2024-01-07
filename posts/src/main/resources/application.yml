@@ -1,0 +1,36 @@
+server:
+  error:
+    include-message: always
+  port: 8081
+spring:
+  servlet:
+    multipart:
+      location: c:/temp/servlet_temp_folder
+      enabled: true
+  jpa:
+    show-sql: true
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    initialization-mode: always
+    url: jdbc:postgresql://localhost:5432/microservice?currentSchema=dev
+    username: postgres
+    password: postgres
+#  liquibase:
+#    liquibase-schema: dev
+logging:
+  file: my-app.log
+  level:
+    org:
+      springframework: INFO
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+minio:
+  endpoint: http://localhost:9000
+  accessKey: N4fEAKZ3MHVNuG8PWZty
+  secretKey: g2VeptSoFqZWDlkMBslRRw3e4K1AYqiEMElFimGn
+  bucketName: postimages
+microservice:
+  users:
+    host: http://localhost:8080

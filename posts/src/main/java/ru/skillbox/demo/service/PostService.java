@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import ru.skillbox.demo.UserHandler;
 import ru.skillbox.demo.entity.Post;
 import ru.skillbox.demo.entity.PostImage;
 import ru.skillbox.demo.repository.PostImageRepository;
 import ru.skillbox.demo.repository.PostRepository;
-import ru.skillbox.demo.repository.UserRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @Service
 public class PostService {
     @Autowired
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
     @Value("${minio.bucketName}")
     private String bucketName;
@@ -38,13 +38,17 @@ public class PostService {
     private final PostImageRepository postImageRepository;
 
     @Autowired
-    private final UserRepository userRepository;
+    private final UserHandler userHandler;
 
-    public PostService(MinioClient minioClient, PostRepository postRepository, PostImageRepository postImageRepository, UserRepository userRepository) {
+
+    public PostService(
+            MinioClient minioClient,
+            PostRepository postRepository,
+            PostImageRepository postImageRepository, UserHandler userHandler) {
         this.minioClient = minioClient;
         this.postRepository = postRepository;
         this.postImageRepository = postImageRepository;
-        this.userRepository = userRepository;
+        this.userHandler = userHandler;
     }
 
     public String createPost(Post post) {
@@ -69,7 +73,7 @@ public class PostService {
     }
 
     public String deletePost(long id) {
-        if (!postRepository.existsById(id)){
+        if (!postRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         postRepository.deleteById(id);
@@ -80,18 +84,22 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public List<Post> getUserPosts(long user_id) {
-        return postRepository.findByUserId(user_id);
+    public List<Post> getUserPosts(long userId) {
+        return postRepository.findByUserId(userId);
     }
 
-    private List<String> saveImagesToMinio(List<MultipartFile> imageFiles) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
+    private List<String> saveImagesToMinio(List<MultipartFile> imageFiles)
+            throws IOException,
+            MinioException,
+            NoSuchAlgorithmException,
+            InvalidKeyException {
 
         List<String> imageIds = new ArrayList<>();
 
         for (MultipartFile imageFile : imageFiles) {
             String imageId = UUID.randomUUID() + "-" + imageFile.getOriginalFilename();
 
-            try (InputStream stream = imageFile.getInputStream()){
+            try (InputStream stream = imageFile.getInputStream()) {
                 minioClient.putObject(
                         PutObjectArgs.builder()
                                 .bucket(bucketName)
@@ -109,16 +117,20 @@ public class PostService {
     }
 
     public String savePost(Post post, List<MultipartFile> imageFiles) {
-        if ((post.getUserId() == null)|(!userRepository.existsById(post.getUserId()))){
+        if (post.getUserId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (!userHandler.existsById(post.getUserId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         try {
             Post savedPost = postRepository.save(post);
 
-            if (imageFiles != null){
+            if (imageFiles != null) {
                 List<String> imageIds = saveImagesToMinio(imageFiles);
-                List<PostImage> postImages = createPostImageEntities(savedPost, imageIds);
+                createPostImageEntities(savedPost, imageIds);
             }
 
             return "post saved with id = " + savedPost.getId().toString();

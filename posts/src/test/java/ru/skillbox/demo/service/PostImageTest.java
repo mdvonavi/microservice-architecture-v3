@@ -18,8 +18,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = {PostgreSQLInitializer.class, MinioInitializer.class})
-public class PostImageTest {
+@ContextConfiguration(initializers = {PostgreSqlInitializer.class, MinioInitializer.class})
+class PostImageTest {
 
     private static final Logger log = LoggerFactory.getLogger("application");
 
@@ -34,7 +34,7 @@ public class PostImageTest {
     }
 
     @Test
-    public void createBucketTest() throws Exception {
+    void createBucketTest() throws Exception {
         minioClient.ignoreCertCheck();
         String bucketName = "test1";
         minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());

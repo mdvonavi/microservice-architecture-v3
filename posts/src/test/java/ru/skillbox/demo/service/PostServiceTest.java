@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.skillbox.demo.entity.Post;
-import ru.skillbox.demo.entity.User;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = {PostgreSQLInitializer.class, MinioInitializer.class})
+@ContextConfiguration(initializers = {PostgreSqlInitializer.class, MinioInitializer.class})
 
-public class PostServiceTest {
+class PostServiceTest {
     private static final Logger log = LoggerFactory.getLogger("application");
 
     private MockMvc mockMvc;
@@ -70,7 +69,7 @@ public class PostServiceTest {
         log.info("start createPost test");
 
         Long savedUserId = createTestUser();
-        Long savedPostId = createTestPost(savedUserId);
+        createTestPost(savedUserId);
     }
 
     @Test
@@ -114,7 +113,7 @@ public class PostServiceTest {
         log.info("start getAllPostForUser test");
 
         Long savedUserId = createTestUser();
-        Long savedPostId = createTestPost(savedUserId);
+        createTestPost(savedUserId);
 
         log.info("try to get all posts");
         log.info("run get request");

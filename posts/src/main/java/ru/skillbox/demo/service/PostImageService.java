@@ -3,7 +3,12 @@ package ru.skillbox.demo.service;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
-import io.minio.errors.*;
+import io.minio.errors.ErrorResponseException;
+import io.minio.errors.InsufficientDataException;
+import io.minio.errors.InvalidResponseException;
+import io.minio.errors.XmlParserException;
+import io.minio.errors.InternalException;
+import io.minio.errors.ServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,9 +28,19 @@ public class PostImageService {
     @Value("${minio.bucketName}")
     private String bucketName;
 
-    public ObjectWriteResponse put(MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public ObjectWriteResponse put(MultipartFile file)
+            throws
+            IOException,
+            InsufficientDataException,
+            ErrorResponseException,
+            NoSuchAlgorithmException,
+            InvalidKeyException,
+            InvalidResponseException,
+            XmlParserException,
+            InternalException,
+            ServerException {
 
-        try (InputStream stream = file.getInputStream()){
+        try (InputStream stream = file.getInputStream()) {
             return minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)

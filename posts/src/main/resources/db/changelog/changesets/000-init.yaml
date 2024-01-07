@@ -1,0 +1,229 @@
+databaseChangeLog:
+  - changeSet:
+      id: 000-1
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  autoIncrement: true
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              -  column:
+                   name: first_name
+                   type: varchar(30)
+              -  column:
+                   name: middle_name
+                   type: varchar(30)
+              -  column:
+                   name: last_name
+                   type: varchar(30)
+              -  column:
+                   name: sex
+                   type: boolean
+              -  column:
+                   name: birth_date
+                   type: date
+              -  column:
+                   name: city
+                   type: int
+              -  column:
+                   name: avatar
+                   type: varchar(10)
+              -  column:
+                   name: info
+                   type: varchar(256)
+              -  column:
+                   name: nickname
+                   type: varchar(20)
+                   constraints:
+                     nullable: false
+              -  column:
+                   name: email
+                   type: varchar(256)
+                   constraints:
+                     nullable: false
+              -  column:
+                   name: phone
+                   type: varchar(11)
+              -  column:
+                   name: deleted
+                   type: boolean
+                   defaultValueBoolean: false
+                   constraints:
+                     nullable: false
+
+  - changeSet:
+      id: 000-2
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: cities
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 000-3
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: images
+            columns:
+              - column:
+                  name: id
+                  type: varchar(10)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: link
+                  type: varchar(2048)
+                  constraints:
+                    nullable: false
+
+#  - changeSet:
+#      id: 000-4
+#      author: mdvonavi
+#      changes:
+#        - addForeignKeyConstraint:
+#            constraintName: users_sities_fk
+#            baseTableName: users
+#            baseColumnNames: city
+#            referencedTableName: cities
+#            referencedColumnNames: id
+
+#  - changeSet:
+#      id: 000-5
+#      author: mdvonavi
+#      changes:
+#        - addForeignKeyConstraint:
+#            constraintName: users_avatar_fk
+#            baseTableName: users
+#            baseColumnNames: avatar
+#            referencedTableName: images
+#            referencedColumnNames: id
+
+  - changeSet:
+      id: 000-6
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: hard_skills
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 000-7
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: users_hard_skills
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: hard_skill
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigserial
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 000-8
+      author: mdvonavi
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: users_hard_skills_hs_fk
+            baseTableName: users_hard_skills
+            baseColumnNames: hard_skill
+            referencedTableName: hard_skills
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 000-9
+      author: mdvonavi
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: users_hard_skills_user_fk
+            baseTableName: users_hard_skills
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 000-10
+      author: mdvonavi
+      changes:
+        - createTable:
+            tableName: subscriptions
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigserial
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subs_id
+                  type: bigserial
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 000-11
+      author: mdvonavi
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: subscriptions_user_fk
+            baseTableName: subscriptions
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 000-12
+      author: mdvonavi
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: subscriptions_subs_fk
+            baseTableName: subscriptions
+            baseColumnNames: subs_id
+            referencedTableName: users
+            referencedColumnNames: id

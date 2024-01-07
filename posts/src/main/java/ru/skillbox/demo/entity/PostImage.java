@@ -3,7 +3,12 @@ package ru.skillbox.demo.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GenerationType;
+import javax.persistence.JoinColumn;
 import java.util.Date;
 
 @Entity
@@ -58,6 +63,6 @@ public class PostImage {
         this.timestamp = timestamp;
     }
 
-    public PostImage(){
+    public PostImage() {
     }
 }

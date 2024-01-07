@@ -1,6 +1,5 @@
 package ru.skillbox.demo.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,10 +8,13 @@ import org.hibernate.annotations.Where;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.GenerationType;
 
-import javax.persistence.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +53,13 @@ public class Post {
         this.descriptions = descriptions;
     }
 
-    public Post(){
+    public Post(Long userId, String title, String descriptions) {
+        this.userId = userId;
+        this.title = title;
+        this.descriptions = descriptions;
+    }
+
+    public Post() {
     }
 
     public Long getId() {
@@ -104,11 +112,9 @@ public class Post {
 
     @Override
     public String toString() {
-        Map<String,Object> post = new HashMap<>();
+        Map<String, Object> post = new HashMap<>();
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        if (this.id != null){
+        if (this.id != null) {
             post.put("id", this.id);
         }
         if (this.title != null) {
@@ -132,7 +138,7 @@ public class Post {
             out = objectMapper.writeValueAsString(post);
             log.info("out string: " + out);
 
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
