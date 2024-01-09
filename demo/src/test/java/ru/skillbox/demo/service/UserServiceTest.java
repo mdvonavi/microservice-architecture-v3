@@ -3,7 +3,6 @@ package ru.skillbox.demo.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.skillbox.demo.entity.User;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = PostgreSQLInitializer.class)
+@ContextConfiguration(initializers = PostgreSqlInitializer.class)
 class UserServiceTest {
-    private static final Logger log = LoggerFactory.getLogger("application");
+    private static final Logger log = LoggerFactory.getLogger("UserServiceTest");
 
     private MockMvc mockMvc;
 
@@ -91,10 +91,14 @@ class UserServiceTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
-    @Order(1)
     @Test
     void getUsersEmptyList() throws Exception {
         log.info("start getUsersEmptyList test");
+        log.info("delete users if exist");
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/all")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        
         log.info("run get request");
         mockMvc.perform(MockMvcRequestBuilders.get("/users")
                 .accept(MediaType.APPLICATION_JSON))
@@ -116,7 +120,6 @@ class UserServiceTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/users")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-//                .andExpect(content().string(String.format("[%s]", savedUser.toString())));
     }
 
     @Test
@@ -141,7 +144,7 @@ class UserServiceTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
+        Long savedUserId = getIdFromResponse(postResult);
 
         log.info("run get request");
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
@@ -166,14 +169,13 @@ class UserServiceTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
-        savedUser.setId(Long.valueOf(savedUserId));
+        Long savedUserId = getIdFromResponse(postResult);
+        savedUser.setId(savedUserId);
 
         log.info("run get request");
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-//                .andExpect(content().json(savedUser.toString()));
 
         User resultUser = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
 
@@ -187,7 +189,6 @@ class UserServiceTest {
         Assertions.assertEquals(resultUser.getAvatar(), user.getAvatar());
         Assertions.assertEquals(resultUser.getCity(), user.getCity());
         Assertions.assertEquals(resultUser.getInfo(), user.getInfo());
-        //Assertions.assertEquals(resultUser.getBirthDate(), user.getBirthDate());
 
     }
 
@@ -222,8 +223,8 @@ class UserServiceTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
-        updatedUser.setId(Long.valueOf(savedUserId));
+        Long savedUserId = getIdFromResponse(postResult);
+        updatedUser.setId(savedUserId);
         log.info("run put request");
         mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", savedUserId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -249,7 +250,6 @@ class UserServiceTest {
     @Test
     void updateUserBadRequest() throws Exception {
         log.info("start updateUserBadRequest test");
-        Integer badUserId = 999;
 
         log.info("run post request");
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
@@ -259,6 +259,7 @@ class UserServiceTest {
                 .andExpect(status().isOk());
 
         log.info("run put request");
+        Integer badUserId = 999;
         mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", badUserId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedUser.toString())
@@ -277,7 +278,7 @@ class UserServiceTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        String savedUserId = postResult.andReturn().getResponse().getContentAsString().split("=")[1].strip();
+        Long savedUserId = getIdFromResponse(postResult);
 
         log.info("run delete request");
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", savedUserId)
@@ -288,6 +289,10 @@ class UserServiceTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/users/{id}", savedUserId)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    Long getIdFromResponse(ResultActions result) throws UnsupportedEncodingException {
+        return Long.parseLong(result.andReturn().getResponse().getContentAsString().split("=")[1].strip());
     }
 
 

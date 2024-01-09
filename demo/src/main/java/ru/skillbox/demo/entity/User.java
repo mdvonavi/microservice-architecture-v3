@@ -1,7 +1,6 @@
 package ru.skillbox.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
@@ -10,7 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GenerationType;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +27,7 @@ import java.util.Map;
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
 @Where(clause = "deleted=false")
 public class User {
-    private static final Logger log = LoggerFactory.getLogger("application");
+    private static final Logger log = LoggerFactory.getLogger("UserService");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -133,6 +136,10 @@ public class User {
         return nickname;
     }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     public User() {
     }
 
@@ -166,11 +173,11 @@ public class User {
 
     @Override
     public String toString() {
-        Map<String,Object> user = new HashMap<>();
+        Map<String, Object> user = new HashMap<>();
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-        if (this.id != null){
+        if (this.id != null) {
             user.put("id", this.id);
         }
         if (this.firstName != null) {
@@ -211,7 +218,7 @@ public class User {
             out = objectMapper.writeValueAsString(user);
             log.info("out string: " + out);
 
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 

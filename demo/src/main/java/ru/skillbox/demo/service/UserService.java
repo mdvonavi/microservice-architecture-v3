@@ -1,7 +1,5 @@
 package ru.skillbox.demo.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -9,12 +7,11 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skillbox.demo.entity.User;
 import ru.skillbox.demo.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
-
-    private static final Logger log = LoggerFactory.getLogger("application");
 
     @Autowired
     private final UserRepository userRepository;
@@ -34,14 +31,14 @@ public class UserService {
     }
 
     public String updateUser(User user, long id) {
-        if (user.getId() != id){
+        if (user.getId() != id) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     String.format("user id %s not equal to path id %s", user.getId(), id)
             );
         }
 
-        if (!userRepository.existsById(id)){
+        if (!userRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
@@ -50,7 +47,7 @@ public class UserService {
     }
 
     public String deleteUser(long id) {
-        if (!userRepository.existsById(id)){
+        if (!userRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         userRepository.deleteById(id);
@@ -59,5 +56,19 @@ public class UserService {
 
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    public void deleteAllUsers() {
+        userRepository.deleteAll();
+    }
+
+    public void subscribe(long user, long subs) {
+    }
+
+    public void unsubscribe(long user, long subs) {
+    }
+
+    public List<String> getSubscribers(long user) {
+        return new ArrayList<>();
     }
 }

@@ -77,6 +77,7 @@ curl DELETE http://localhost:8080/users/1
 ```shell
 kubectl create namespace dev
 kubectl create namespace preprod
+kubectl create namespace prod
 ```
 
 Благодарим вас за ваши усилия и интерес к нашему проекту!

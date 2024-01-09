@@ -26,20 +26,20 @@ public class UserController {
     }
 
     @Operation(summary = "Получение пользователя")
-    @GetMapping(path="/{id}")
-    String getUser(@PathVariable long id){
+    @GetMapping(path = "/{id}")
+    String getUser(@PathVariable long id) {
         return userService.getUser(id).toString();
     }
 
     @Operation(summary = "Обновление пользователя")
-    @PutMapping(path="/{id}")
-    String updateUser(@RequestBody User user, @PathVariable long id){
+    @PutMapping(path = "/{id}")
+    String updateUser(@RequestBody User user, @PathVariable long id) {
         return userService.updateUser(user, id);
     }
 
     @Operation(summary = "Удаление пользователя")
-    @DeleteMapping(path="/{id}")
-    String deleteUser(@PathVariable long id){
+    @DeleteMapping(path = "/{id}")
+    String deleteUser(@PathVariable long id) {
         return userService.deleteUser(id);
     }
 
@@ -52,6 +52,30 @@ public class UserController {
                 .collect(Collectors.toList())
                 .toString();
     }
+
+    @Operation(summary = "Удаление ВСЕХ пользователей")
+    @DeleteMapping(path = "/all")
+    public void deleteAllUsers() {
+        userService.deleteAllUsers();
+    }
+
+//    @Operation(summary = "Подписка на пользователя")
+//    @PostMapping(path = "/{id}/subscribe/{id}")
+//    public void subscribe(@PathVariable long user, @PathVariable long subs) {
+//        userService.subscribe(user, subs);
+//    }
+
+//    @Operation(summary = "Удаление подписки на пользователя")
+//    @DeleteMapping(path = "/{id}/unsubscribe/{id}")
+//    public void unsubscribe(@PathVariable long user, @PathVariable long subs) {
+//        userService.unsubscribe(user, subs);
+//    }
+
+//    @Operation(summary = "Все подписки на пользователя")
+//    @GetMapping(path = "/{id}/subscribers")
+//    public List<String> getSubscribers(@PathVariable long user) {
+//        return userService.getSubscribers(user);
+//    }
 
 
 }
